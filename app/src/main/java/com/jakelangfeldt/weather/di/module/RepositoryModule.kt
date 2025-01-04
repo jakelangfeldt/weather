@@ -1,8 +1,9 @@
 package com.jakelangfeldt.weather.di.module
 
+import com.jakelangfeldt.weather.data.datasource.local.WeatherDatabase
+import com.jakelangfeldt.weather.data.datasource.remote.OpenWeatherMapService
 import com.jakelangfeldt.weather.data.repository.OpenWeatherMapRepository
 import com.jakelangfeldt.weather.data.repository.OpenWeatherMapRepositoryImpl
-import com.jakelangfeldt.weather.data.datasource.OpenWeatherMapService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +16,10 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideRepository(openWeatherMapService: OpenWeatherMapService): OpenWeatherMapRepository {
-        return OpenWeatherMapRepositoryImpl(openWeatherMapService)
+    fun provideRepository(
+        openWeatherMapService: OpenWeatherMapService,
+        weatherDatabase: WeatherDatabase,
+    ): OpenWeatherMapRepository {
+        return OpenWeatherMapRepositoryImpl(openWeatherMapService, weatherDatabase)
     }
 }

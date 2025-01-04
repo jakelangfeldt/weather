@@ -1,7 +1,7 @@
-package com.jakelangfeldt.weather.data.datasource
+package com.jakelangfeldt.weather.data.datasource.remote
 
-import com.jakelangfeldt.weather.data.datasource.response.Coordinates
-import com.jakelangfeldt.weather.data.datasource.response.Forecasts
+import com.jakelangfeldt.weather.data.datasource.remote.response.Coordinates
+import com.jakelangfeldt.weather.data.datasource.remote.response.Forecasts
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -22,4 +22,8 @@ interface OpenWeatherMapService {
         @Query("units") units: String,
         @Query("appid") appId: String,
     ): Response<Forecasts>
+
+    companion object {
+        const val BASE_URL = "https://api.openweathermap.org/"
+    }
 }

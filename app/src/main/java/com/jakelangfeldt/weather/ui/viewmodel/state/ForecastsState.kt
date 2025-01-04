@@ -1,7 +1,7 @@
 package com.jakelangfeldt.weather.ui.viewmodel.state
 
 data class ForecastsState(
-    val name: String? = null,
+    val location: String? = null,
     val forecasts: List<Forecast> = emptyList(),
 )
 
