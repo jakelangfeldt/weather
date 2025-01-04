@@ -19,7 +19,6 @@ object RepositoryModule {
     fun provideRepository(
         openWeatherMapService: OpenWeatherMapService,
         weatherDatabase: WeatherDatabase,
-    ): OpenWeatherMapRepository {
-        return OpenWeatherMapRepositoryImpl(openWeatherMapService, weatherDatabase)
-    }
+    ): OpenWeatherMapRepository =
+        OpenWeatherMapRepositoryImpl(openWeatherMapService, weatherDatabase)
 }

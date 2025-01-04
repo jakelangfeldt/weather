@@ -8,20 +8,33 @@ import com.jakelangfeldt.weather.BuildConfig
 import com.jakelangfeldt.weather.data.repository.OpenWeatherMapRepository
 import com.jakelangfeldt.weather.data.repository.Result
 import com.jakelangfeldt.weather.data.repository.model.ForecastsModel
-import com.jakelangfeldt.weather.domain.DateUtils
+import com.jakelangfeldt.weather.domain.DateUtilities
+import com.jakelangfeldt.weather.domain.DateUtilities.Companion.isInPast
+import com.jakelangfeldt.weather.domain.DateUtilities.Companion.toMillis
 import com.jakelangfeldt.weather.domain.FormatTemperatureUseCase
+import com.jakelangfeldt.weather.domain.FormatWindUseCase
 import com.jakelangfeldt.weather.ui.viewmodel.state.Forecast
 import com.jakelangfeldt.weather.ui.viewmodel.state.ForecastsState
 import com.jakelangfeldt.weather.ui.viewmodel.state.Temperature
+import com.jakelangfeldt.weather.ui.viewmodel.state.Weather
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
+import kotlin.math.roundToInt
 import com.jakelangfeldt.weather.data.repository.model.Forecast as ForecastModel
 import com.jakelangfeldt.weather.data.repository.model.Temperature as TemperatureModel
+import com.jakelangfeldt.weather.data.repository.model.Weather as WeatherModel
+
+private const val NUM_FORECASTS_TO_DISPLAY = 5
 
 @HiltViewModel
 class ForecastsViewModel @Inject constructor(
     private val formatTemperatureUseCase: FormatTemperatureUseCase,
+    private val formatWindUseCase: FormatWindUseCase,
     private val openWeatherMapRepository: OpenWeatherMapRepository,
 ) :
     ViewModel() {
@@ -51,21 +64,39 @@ class ForecastsViewModel @Inject constructor(
         }
     }
 
+    private fun getWeatherIconUrl(icon: String?) = if (icon != null) {
+        "https://openweathermap.org/img/wn/$icon@2x.png"
+    } else {
+        ""
+    }
+
     private fun ForecastsModel.toForecastsState() = ForecastsState(
         location = location,
-        forecasts = forecasts?.map { it.toForecast(location, timezone) }.orEmpty(),
+        forecasts = forecasts?.filter {
+            val timeZone = TimeZone.getTimeZone(timezone)
+            !Calendar.getInstance(timeZone, Locale.getDefault())
+                .apply { this.time = Date(it.time?.toMillis() ?: 0L) }.isInPast(timeZone)
+        }?.take(NUM_FORECASTS_TO_DISPLAY)?.map { it.toForecast(location, timezone) }.orEmpty(),
     )
 
     private fun ForecastModel.toForecast(location: String?, timezone: String?) = Forecast(
         location = location,
-        date = DateUtils.getFormattedDate(time, timezone),
-        dayOfWeek = null,
+        date = DateUtilities.getFormattedDate(time?.toMillis(), timezone),
+        sunrise = DateUtilities.getFormattedTime(sunrise?.toMillis(), timezone),
+        sunset = DateUtilities.getFormattedTime(sunset?.toMillis(), timezone),
         summary = summary,
-        temperature = temperature?.toTemperature()
+        temperature = temperature?.toTemperature(),
+        wind = formatWindUseCase(windSpeed, windDegrees),
+        weather = weatherList?.firstOrNull()?.toWeather(),
+        uvi = uvi?.roundToInt()?.toString(),
     )
 
     private fun TemperatureModel.toTemperature() = Temperature(
-        min = formatTemperatureUseCase(this.min),
-        max = formatTemperatureUseCase(this.max),
+        min = formatTemperatureUseCase(min),
+        max = formatTemperatureUseCase(max),
+    )
+
+    private fun WeatherModel.toWeather() = Weather(
+        iconUrl = getWeatherIconUrl(icon),
     )
 }
