@@ -9,8 +9,8 @@ import com.jakelangfeldt.weather.data.repository.OpenWeatherMapRepository
 import com.jakelangfeldt.weather.data.repository.Result
 import com.jakelangfeldt.weather.data.repository.model.ForecastsModel
 import com.jakelangfeldt.weather.domain.DateUtilities
-import com.jakelangfeldt.weather.domain.DateUtilities.Companion.isInPast
-import com.jakelangfeldt.weather.domain.DateUtilities.Companion.toMillis
+import com.jakelangfeldt.weather.domain.DateUtilities.isInPast
+import com.jakelangfeldt.weather.domain.DateUtilities.toMillis
 import com.jakelangfeldt.weather.domain.FormatTemperatureUseCase
 import com.jakelangfeldt.weather.domain.FormatWindUseCase
 import com.jakelangfeldt.weather.ui.viewmodel.state.Forecast
