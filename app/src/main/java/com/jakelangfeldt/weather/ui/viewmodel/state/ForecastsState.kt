@@ -3,6 +3,7 @@ package com.jakelangfeldt.weather.ui.viewmodel.state
 data class ForecastsState(
     val location: String? = null,
     val forecasts: List<Forecast> = emptyList(),
+    val selectedForecast: Forecast? = null,
 )
 
 data class Forecast(

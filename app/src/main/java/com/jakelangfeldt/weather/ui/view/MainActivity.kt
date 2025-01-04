@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             WeatherTheme {
-                ForecastsScreen(viewModel)
+                Weather(viewModel)
             }
         }
     }
